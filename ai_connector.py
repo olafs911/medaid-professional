@@ -755,13 +755,17 @@ def analyze_image_with_medgemma_4b(image, image_type, clinical_context=""):
             response = client.visual_question_answering(
                 image=img_bytes,
                 question=medical_prompt,
-                model="google/medgemma-4b"  # Official Google MedGemma 4B
+                model="google/medgemma-4b-it"  # Correct model name with -it suffix
             )
             
             if response:
                 return format_medgemma_response(response, image_type, clinical_context)
         except Exception as e:
-            st.info(f"MedGemma 4B not available, trying alternative models: {str(e)}")
+            error_msg = str(e)
+            if "gated" in error_msg.lower() or "terms" in error_msg.lower() or "401" in error_msg:
+                st.warning("🔐 **MedGemma 4B requires acceptance of terms**: Visit https://huggingface.co/google/medgemma-4b-it to accept Google's Health AI Developer Foundation terms, then try again.")
+            else:
+                st.info(f"MedGemma 4B not available, trying alternative models: {error_msg}")
         
         # Fallback to other multimodal models
         fallback_models = [
