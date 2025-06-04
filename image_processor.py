@@ -42,19 +42,49 @@ def process_dermatology_image(img_array):
 
 def process_radiology_image(img_array):
     """Specific processing for X-rays, CT scans, etc."""
-    # Convert to grayscale if needed
-    if len(img_array.shape) == 3:
-        gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
-    else:
-        gray = img_array
-    
-    features = {
-        "histogram": np.histogram(gray, bins=50)[0].tolist(),
-        "mean_intensity": float(np.mean(gray)),
-        "std_intensity": float(np.std(gray)),
-        "image_quality": "Good" if np.std(gray) > 20 else "Low contrast"
-    }
-    return features
+    try:
+        # Handle different image formats safely
+        if not isinstance(img_array, np.ndarray):
+            return {"error": "Invalid image data"}
+        
+        # Convert to uint8 if needed
+        if img_array.dtype != np.uint8:
+            img_array = (img_array * 255).astype(np.uint8) if img_array.max() <= 1 else img_array.astype(np.uint8)
+        
+        # Convert to grayscale safely
+        if len(img_array.shape) == 3:
+            if img_array.shape[2] == 3:
+                gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
+            elif img_array.shape[2] == 4:  # RGBA
+                gray = cv2.cvtColor(img_array, cv2.COLOR_RGBA2GRAY)
+            else:
+                gray = img_array[:, :, 0]  # Take first channel
+        elif len(img_array.shape) == 2:
+            gray = img_array
+        else:
+            gray = np.mean(img_array, axis=-1).astype(np.uint8)
+        
+        features = {
+            "histogram": np.histogram(gray, bins=50)[0].tolist(),
+            "mean_intensity": float(np.mean(gray)),
+            "std_intensity": float(np.std(gray)),
+            "image_quality": "Good" if np.std(gray) > 20 else "Low contrast",
+            "min_intensity": float(np.min(gray)),
+            "max_intensity": float(np.max(gray)),
+            "processing_status": "Success"
+        }
+        return features
+        
+    except Exception as e:
+        # Fallback processing
+        return {
+            "histogram": [],
+            "mean_intensity": float(np.mean(img_array)),
+            "std_intensity": float(np.std(img_array)),
+            "image_quality": "Processing error - using fallback",
+            "processing_status": f"Error: {str(e)}",
+            "fallback_analysis": True
+        }
 
 def process_pathology_image(img_array):
     """Specific processing for pathology/microscopy images"""
