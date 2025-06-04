@@ -246,6 +246,14 @@ with tab3:
                 # Display results
                 st.subheader("🤖 AI Analysis Results")
                 
+                # Enhanced status indicators
+                if ai_response.get('ai_analysis_active'):
+                    st.success("✅ **AI Model Analysis Active** - Using " + ai_response.get('ai_model_used', 'medical AI'))
+                elif ai_response.get('demo_mode'):
+                    st.info("🧠 **Intelligent Medical Analysis** - Analyzing your clinical input with medical knowledge base")
+                else:
+                    st.warning("⚠️ **Basic Analysis Mode**")
+                
                 col1, col2 = st.columns(2)
                 
                 with col1:
@@ -253,9 +261,10 @@ with tab3:
                     # Display differential diagnoses
                     if ai_response.get('diagnoses'):
                         for i, diagnosis in enumerate(ai_response['diagnoses'], 1):
+                            confidence_color = "🔴" if "high" in diagnosis.get('confidence', '').lower() else "🟡" if "medium" in diagnosis.get('confidence', '').lower() else "🟢"
                             st.markdown(f"**{i}. {diagnosis['condition']}**")
-                            st.markdown(f"Confidence: {diagnosis['confidence']}%")
-                            st.markdown(f"Reasoning: {diagnosis['reasoning']}")
+                            st.markdown(f"{confidence_color} Confidence: {diagnosis['confidence']}")
+                            st.markdown(f"📋 Reasoning: {diagnosis['reasoning']}")
                             st.markdown("---")
                     elif ai_response.get('raw_response'):
                         st.markdown(ai_response['raw_response'])
@@ -263,13 +272,26 @@ with tab3:
                 with col2:
                     st.markdown("### Recommended Actions")
                     if ai_response.get('recommendations'):
-                        for rec in ai_response['recommendations']:
-                            st.markdown(f"• {rec}")
+                        for i, rec in enumerate(ai_response['recommendations'], 1):
+                            priority = "🚨" if any(word in rec.lower() for word in ['urgent', 'immediate', 'stat', 'emergency']) else "⚡"
+                            st.markdown(f"{priority} **{i}.** {rec}")
                     
                     st.markdown("### Additional Tests Suggested")
                     if ai_response.get('additional_tests'):
-                        for test in ai_response['additional_tests']:
-                            st.markdown(f"• {test}")
+                        for i, test in enumerate(ai_response['additional_tests'], 1):
+                            st.markdown(f"🔬 **{i}.** {test}")
+                
+                # Show urgent concerns prominently if present
+                if ai_response.get('urgent_concerns'):
+                    st.markdown("---")
+                    st.error("⚠️ **URGENT CLINICAL CONCERNS**")
+                    for concern in ai_response['urgent_concerns']:
+                        st.markdown(f"🚨 {concern}")
+                
+                # Add medical disclaimer for intelligent analysis
+                if ai_response.get('demo_mode'):
+                    st.markdown("---")
+                    st.info("💡 **Note:** This analysis is based on clinical pattern recognition. Always correlate with physical examination and use clinical judgment.")
 
 # Professional footer with case export
 st.markdown("---")
