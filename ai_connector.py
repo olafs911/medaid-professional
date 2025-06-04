@@ -14,7 +14,6 @@ try:
     VERTEX_AI_AVAILABLE = True
 except ImportError:
     VERTEX_AI_AVAILABLE = False
-    st.info("💡 Install google-cloud-aiplatform for Vertex AI MedGemma access: `pip install google-cloud-aiplatform`")
 
 # Hugging Face imports  
 try:
@@ -586,6 +585,11 @@ def get_demo_image_response(image_type):
         "note": "Connect Hugging Face API for enhanced vision AI analysis"
     }
 
+def show_vertex_ai_setup_info():
+    """Show Vertex AI setup information when appropriate"""
+    if not VERTEX_AI_AVAILABLE:
+        st.info("💡 **Vertex AI MedGemma 4B available!** Install `google-cloud-aiplatform` and configure your Google Cloud project ID for real medical image analysis.")
+
 def get_vertex_ai_client():
     """Initialize Vertex AI client"""
     try:
@@ -970,6 +974,9 @@ def analyze_image(image, image_type, clinical_context=""):
                     st.warning("⚠️ MedGemma 4B unavailable, trying alternatives...")
             except Exception as e:
                 st.warning(f"⚠️ MedGemma 4B error: {str(e)}, trying alternatives...")
+        else:
+            # Show setup info only when user is actually trying to analyze an image
+            show_vertex_ai_setup_info()
         
         # Priority 2: Try Hugging Face free models
         if HF_AVAILABLE:
