@@ -9,7 +9,7 @@ import json
 
 # Import our helper modules
 from image_processor import process_medical_image, get_image_features
-from ai_connector import get_medgemma_response, analyze_image_with_ai
+from ai_connector import get_medgemma_response, analyze_image_with_ai, analyze_image_with_real_medical_ai
 
 # Page configuration
 st.set_page_config(
@@ -156,7 +156,50 @@ with tab1:
 
 # Tab 2: Image Analysis
 with tab2:
-    st.header("Medical Image Upload & Analysis")
+    st.header("🖼️ Medical Image Upload & Analysis")
+    st.markdown("Upload medical images for AI-powered analysis.")
+    
+    # Medical AI Information Panel
+    with st.expander("🔬 **Image Analysis Options & Capabilities**", expanded=False):
+        col_info1, col_info2, col_info3 = st.columns(3)
+        
+        with col_info1:
+            st.markdown("### 🆓 **Your Current Setup:**")
+            st.info("""
+            **Without API Key:**
+            • ✅ Clinical text analysis only
+            • ✅ Medical knowledge responses
+            • ❌ No image analysis
+            
+            **Get HuggingFace key for FREE upgrade!**
+            """)
+        
+        with col_info2:
+            st.markdown("### 🏆 **MedGemma 4B (BEST FREE!):**")
+            st.success("""
+            **Google's Medical AI - FREE:**
+            • ✅ REAL medical image analysis
+            • ✅ Trained on radiology, pathology, dermatology
+            • ✅ Medical image classification & interpretation
+            • ✅ Specifically built for healthcare
+            • 🆓 Completely FREE with HF API key!
+            
+            **This is a GAME CHANGER! 🚀**
+            """)
+        
+        with col_info3:
+            st.markdown("### 💰 **Professional APIs:**")
+            st.warning("""
+            **Radiobotics/AZmed:**
+            • 🎯 94% fracture accuracy
+            • 💰 ~$1-3 per analysis
+            • ⚕️ FDA/CE approved
+            • 🏥 For hospitals/clinics
+            
+            **MedGemma 4B might be better!**
+            """)
+    
+    st.markdown("---")
     
     # Image upload section
     uploaded_files = st.file_uploader(
@@ -194,8 +237,8 @@ with tab2:
                         # Process the medical image for basic features
                         analysis_result = process_medical_image(image, image_type)
                         
-                        # Get AI vision analysis
-                        ai_analysis = analyze_image_with_ai(image, image_type, st.session_state.case_data.get('symptoms', ''))
+                        # Get AI vision analysis - try real medical AI first
+                        ai_analysis = analyze_image_with_real_medical_ai(image, image_type, st.session_state.case_data.get('symptoms', ''))
                         
                         st.success("Analysis complete!")
                         
