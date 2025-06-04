@@ -153,10 +153,46 @@ with tab2:
                 # Process image button
                 if st.button(f"Analyze {uploaded_file.name}", key=f"analyze_{idx}"):
                     with st.spinner("Processing image..."):
-                        # Process the medical image
+                        # Process the medical image for basic features
                         analysis_result = process_medical_image(image, image_type)
+                        
+                        # Get AI vision analysis
+                        ai_analysis = analyze_image_with_ai(image, image_type, st.session_state.case_data.get('symptoms', ''))
+                        
                         st.success("Analysis complete!")
-                        st.json(analysis_result)
+                        
+                        # Display results in tabs
+                        img_tab1, img_tab2 = st.tabs(["🔍 Image Features", "🤖 AI Analysis"])
+                        
+                        with img_tab1:
+                            st.subheader("Technical Image Analysis")
+                            st.json(analysis_result)
+                        
+                        with img_tab2:
+                            st.subheader("AI Vision Analysis")
+                            
+                            if ai_analysis.get('vision_ai_active'):
+                                st.success("✅ AI Vision Analysis Active")
+                            elif ai_analysis.get('demo_mode'):
+                                st.info("ℹ️ Demo Mode - Connect API for full analysis")
+                            
+                            col_a, col_b = st.columns(2)
+                            
+                            with col_a:
+                                st.markdown("**AI Findings:**")
+                                for finding in ai_analysis.get('ai_findings', []):
+                                    st.markdown(f"• {finding}")
+                                
+                                st.markdown("**Clinical Observations:**")
+                                for obs in ai_analysis.get('clinical_observations', []):
+                                    st.markdown(f"• {obs}")
+                            
+                            with col_b:
+                                st.markdown("**Recommendations:**")
+                                for rec in ai_analysis.get('recommendations', []):
+                                    st.markdown(f"• {rec}")
+                                
+                                st.markdown(f"**Confidence Level:** {ai_analysis.get('confidence', 'Not specified')}")
 
 # Tab 3: AI Analysis
 with tab3:
