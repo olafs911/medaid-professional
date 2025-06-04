@@ -3,8 +3,6 @@ import json
 import streamlit as st
 import base64
 import io
-import vertexai
-from vertexai.generative_models import GenerativeModel, Part
 from datetime import datetime
 from PIL import Image
 import os
