@@ -76,23 +76,56 @@ def process_general_image(img_array):
 
 def calculate_image_quality(img_array):
     """Calculate basic image quality score"""
-    # Simple quality metrics
-    sharpness = calculate_sharpness(img_array)
-    brightness = np.mean(img_array)
-    contrast = np.std(img_array)
-    
-    # Normalize to 0-100 scale
-    quality_score = min(100, (sharpness * 0.4 + (brightness/255) * 30 + (contrast/128) * 30))
-    return round(quality_score, 1)
+    try:
+        # Simple quality metrics with error handling
+        sharpness = calculate_sharpness(img_array)
+        brightness = float(np.mean(img_array))
+        contrast = float(np.std(img_array))
+        
+        # Normalize to 0-100 scale
+        sharpness_norm = min(50, sharpness / 100)  # Normalize sharpness
+        brightness_norm = min(30, (brightness/255) * 30) if brightness <= 255 else min(30, brightness * 30)
+        contrast_norm = min(20, (contrast/128) * 20) if contrast <= 128 else min(20, contrast * 20)
+        
+        quality_score = sharpness_norm + brightness_norm + contrast_norm
+        return round(min(100, max(0, quality_score)), 1)
+        
+    except Exception as e:
+        # Fallback quality score
+        return 50.0
 
 def calculate_sharpness(img_array):
     """Calculate image sharpness using Laplacian variance"""
-    if len(img_array.shape) == 3:
-        gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
-    else:
-        gray = img_array
-    
-    return cv2.Laplacian(gray, cv2.CV_64F).var()
+    try:
+        # Ensure we have a valid numpy array
+        if not isinstance(img_array, np.ndarray):
+            return 0.0
+        
+        # Convert to uint8 if needed
+        if img_array.dtype != np.uint8:
+            img_array = (img_array * 255).astype(np.uint8) if img_array.max() <= 1 else img_array.astype(np.uint8)
+        
+        # Handle different image formats
+        if len(img_array.shape) == 3:
+            # Check if it's RGB or BGR and convert to grayscale
+            if img_array.shape[2] == 3:
+                gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
+            elif img_array.shape[2] == 4:  # RGBA
+                gray = cv2.cvtColor(img_array, cv2.COLOR_RGBA2GRAY)
+            else:
+                gray = img_array[:, :, 0]  # Take first channel
+        elif len(img_array.shape) == 2:
+            gray = img_array
+        else:
+            return 0.0
+        
+        # Calculate Laplacian variance
+        laplacian = cv2.Laplacian(gray, cv2.CV_64F)
+        return float(laplacian.var())
+        
+    except Exception as e:
+        # Fallback to simple standard deviation if OpenCV fails
+        return float(np.std(img_array))
 
 def estimate_tissue_area(img_array):
     """Estimate tissue area in pathology images"""
