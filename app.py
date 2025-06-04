@@ -9,7 +9,7 @@ import json
 
 # Import our helper modules
 from image_processor import process_medical_image, get_image_features
-from ai_connector import get_medgemma_response, analyze_image_with_ai, analyze_image_with_real_medical_ai
+from ai_connector import get_medgemma_response, analyze_image_with_ai, analyze_image
 
 # Page configuration
 st.set_page_config(
@@ -164,39 +164,89 @@ with tab2:
         col_info1, col_info2, col_info3 = st.columns(3)
         
         with col_info1:
-            st.markdown("### 🆓 **Your Current Setup:**")
-            st.info("""
-            **Without API Key:**
-            • ✅ Clinical text analysis only
-            • ✅ Medical knowledge responses
-            • ❌ No image analysis
+            st.markdown("### 🏆 **Vertex AI MedGemma 4B (BEST!):**")
+            st.success("""
+            **Google's Official Medical AI:**
+            • ✅ REAL medical image analysis
+            • ✅ Trained on radiology, pathology, dermatology
+            • ✅ Production-grade Google infrastructure  
+            • ✅ No local hardware needed
+            • 💰 ~$0.002-0.02 per analysis
             
-            **Get HuggingFace key for FREE upgrade!**
+            **Setup:** Google Cloud account + Vertex AI API
             """)
         
         with col_info2:
-            st.markdown("### 🏆 **MedGemma 4B (BEST FREE!):**")
-            st.success("""
-            **Google's Medical AI - FREE:**
-            • ✅ REAL medical image analysis
-            • ✅ Trained on radiology, pathology, dermatology
-            • ✅ Medical image classification & interpretation
-            • ✅ Specifically built for healthcare
-            • 🆓 Completely FREE with HF API key!
+            st.markdown("### 🆓 **Free Computer Vision:**")
+            st.info("""
+            **Hugging Face API (FREE):**
+            • ✅ Real image analysis
+            • ✅ Object detection + classification
+            • ✅ Medical context correlation
+            • ⚠️ General AI + medical knowledge
             
-            **This is a GAME CHANGER! 🚀**
+            **Setup:** Free Hugging Face API key
             """)
         
         with col_info3:
-            st.markdown("### 💰 **Professional APIs:**")
+            st.markdown("### 📚 **Demo Mode:**")
             st.warning("""
-            **Radiobotics/AZmed:**
-            • 🎯 94% fracture accuracy
-            • 💰 ~$1-3 per analysis
-            • ⚕️ FDA/CE approved
-            • 🏥 For hospitals/clinics
+            **Your Current Setup:**
+            • ✅ Clinical text analysis
+            • ✅ Medical knowledge responses
+            • ❌ No image pixel analysis
+            • 🎯 Educational/demo purposes
             
-            **MedGemma 4B might be better!**
+            **Upgrade:** Add API keys for real analysis
+            """)
+        
+        st.markdown("---")
+        st.markdown("### 🔑 **Quick Setup Guide:**")
+        
+        setup_option = st.radio(
+            "What would you like to set up?",
+            ["🏥 Vertex AI MedGemma 4B (Recommended)", "🆓 Free Computer Vision", "📖 Learn More"],
+            horizontal=True
+        )
+        
+        if setup_option == "🏥 Vertex AI MedGemma 4B (Recommended)":
+            st.markdown("""
+            **Step 1:** Create [Google Cloud account](https://cloud.google.com/) (free tier available)
+            **Step 2:** Enable Vertex AI API in [Google Cloud Console](https://console.cloud.google.com/)
+            **Step 3:** Add `GOOGLE_CLOUD_PROJECT_ID` to your Streamlit secrets
+            **Step 4:** Install: `pip install google-cloud-aiplatform`
+            
+            **Benefits:** 
+            - Official Google medical AI 
+            - Highest accuracy for medical images
+            - Professional-grade infrastructure
+            - Pay-per-use pricing (~$0.002-0.02 per image)
+            """)
+        
+        elif setup_option == "🆓 Free Computer Vision":
+            st.markdown("""
+            **Step 1:** Get free [Hugging Face API key](https://huggingface.co/settings/tokens)
+            **Step 2:** Add `HUGGINGFACE_API_KEY` to Streamlit secrets  
+            **Step 3:** Enjoy free computer vision analysis!
+            
+            **Benefits:**
+            - Completely free
+            - Real image analysis 
+            - Good for general medical context
+            - No usage limits
+            """)
+        
+        elif setup_option == "📖 Learn More":
+            st.markdown("""
+            **Vertex AI vs Free Options:**
+            
+            | Feature | Vertex AI MedGemma | Free Computer Vision | Demo Mode |
+            |---------|-------------------|---------------------|-----------|
+            | Medical Training | ✅ Specialized | ⚠️ General | ❌ Text only |
+            | Image Analysis | ✅ Medical AI | ✅ Basic vision | ❌ None |
+            | Accuracy | 🏆 Highest | 📊 Good | 📚 Educational |
+            | Cost | 💰 Pay per use | 🆓 Free | 🆓 Free |
+            | Setup | ⚙️ Moderate | 🔧 Easy | ✅ Ready |
             """)
     
     st.markdown("---")
@@ -238,7 +288,7 @@ with tab2:
                         analysis_result = process_medical_image(image, image_type)
                         
                         # Get AI vision analysis - try real medical AI first
-                        ai_analysis = analyze_image_with_real_medical_ai(image, image_type, st.session_state.case_data.get('symptoms', ''))
+                        ai_analysis = analyze_image(image, image_type, st.session_state.case_data.get('symptoms', ''))
                         
                         st.success("Analysis complete!")
                         
