@@ -137,7 +137,7 @@ with tab2:
             with cols[idx % 3]:
                 # Display image
                 image = Image.open(uploaded_file)
-                st.image(image, caption=uploaded_file.name, use_column_width=True)
+                st.image(image, caption=uploaded_file.name, use_container_width=True)
                 
                 # Image metadata
                 st.caption(f"Size: {image.size}")
