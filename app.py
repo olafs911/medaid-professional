@@ -171,28 +171,52 @@ with tab2:
                         with img_tab2:
                             st.subheader("AI Vision Analysis")
                             
+                            # Status indicator
                             if ai_analysis.get('vision_ai_active'):
                                 st.success("✅ AI Vision Analysis Active")
                             elif ai_analysis.get('demo_mode'):
                                 st.info("ℹ️ Demo Mode - Connect API for full analysis")
                             
-                            col_a, col_b = st.columns(2)
+                            # Main content in expandable sections for better space usage
+                            with st.expander("🔍 AI Findings", expanded=True):
+                                findings = ai_analysis.get('ai_findings', [])
+                                if findings:
+                                    for i, finding in enumerate(findings, 1):
+                                        st.markdown(f"**{i}.** {finding}")
+                                else:
+                                    st.markdown("*No specific findings available*")
+                            
+                            col_a, col_b = st.columns([1, 1])
                             
                             with col_a:
-                                st.markdown("**AI Findings:**")
-                                for finding in ai_analysis.get('ai_findings', []):
-                                    st.markdown(f"• {finding}")
-                                
-                                st.markdown("**Clinical Observations:**")
-                                for obs in ai_analysis.get('clinical_observations', []):
-                                    st.markdown(f"• {obs}")
+                                with st.expander("🏥 Clinical Observations", expanded=True):
+                                    observations = ai_analysis.get('clinical_observations', [])
+                                    if observations:
+                                        for obs in observations:
+                                            st.markdown(f"• {obs}")
+                                    else:
+                                        st.markdown("*No observations available*")
                             
                             with col_b:
-                                st.markdown("**Recommendations:**")
-                                for rec in ai_analysis.get('recommendations', []):
-                                    st.markdown(f"• {rec}")
-                                
-                                st.markdown(f"**Confidence Level:** {ai_analysis.get('confidence', 'Not specified')}")
+                                with st.expander("💡 Recommendations", expanded=True):
+                                    recommendations = ai_analysis.get('recommendations', [])
+                                    if recommendations:
+                                        for rec in recommendations:
+                                            st.markdown(f"• {rec}")
+                                    else:
+                                        st.markdown("*No recommendations available*")
+                            
+                            # Confidence and additional info
+                            st.markdown("---")
+                            col_conf, col_note = st.columns([1, 1])
+                            
+                            with col_conf:
+                                confidence = ai_analysis.get('confidence', 'Not specified')
+                                st.metric("Confidence Level", confidence)
+                            
+                            with col_note:
+                                if ai_analysis.get('note'):
+                                    st.info(ai_analysis['note'])
 
 # Tab 3: AI Analysis
 with tab3:
