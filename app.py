@@ -19,11 +19,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Professional header
+# Professional header with better spacing
 st.title("🩺 MedAid Professional Assistant")
 st.markdown("### AI-Powered Diagnostic Support for Healthcare Professionals")
+st.markdown("---")  # Add separator
 
-# CRITICAL DISCLAIMERS - Always visible
+# CRITICAL DISCLAIMERS - Always visible with better formatting
 st.error("""
 ⚠️ **PROFESSIONAL USE DISCLAIMER** ⚠️
 - This is a DIAGNOSTIC ASSISTANCE TOOL ONLY
@@ -34,27 +35,43 @@ st.error("""
 - Use only as a supplementary consultation tool
 """)
 
+st.markdown("---")  # Add separator after disclaimer
+
 # Sidebar for professional information
 with st.sidebar:
-    st.header("Professional Information")
+    st.header("👨‍⚕️ Professional Information")
+    st.markdown("---")
     
     # Healthcare professional verification
-    provider_name = st.text_input("Healthcare Provider Name")
-    license_number = st.text_input("Medical License Number")
-    facility = st.text_input("Medical Facility")
+    provider_name = st.text_input("Healthcare Provider Name", placeholder="Dr. John Smith")
+    license_number = st.text_input("Medical License Number", placeholder="MD123456")
+    facility = st.text_input("Medical Facility", placeholder="General Hospital")
     
     if not provider_name or not license_number:
-        st.warning("Please enter your professional credentials")
+        st.warning("⚠️ Please enter your professional credentials")
         st.stop()
     
     st.success("✅ Professional Mode Activated")
+    st.markdown("---")
     
-    # Case information
-    st.header("Case Information")
-    patient_id = st.text_input("Patient ID (anonymized)")
+    # Case information with better organization
+    st.header("📋 Case Information")
+    patient_id = st.text_input("Patient ID (anonymized)", placeholder="CASE001")
     case_date = st.date_input("Date", datetime.now())
+    
+    # Add some helpful info in sidebar
+    st.markdown("---")
+    st.markdown("### 💡 Quick Tips")
+    st.info("""
+    **For Best Results:**
+    • Be specific in symptom descriptions
+    • Include relevant medical history
+    • Upload clear, relevant images
+    • Always correlate with clinical judgment
+    """)
 
-# Main interface tabs
+# Main interface tabs with better spacing
+st.markdown("## 📊 Clinical Analysis Dashboard")
 tab1, tab2, tab3 = st.tabs(["📝 Clinical Input", "🖼️ Image Analysis", "🔍 AI Analysis"])
 
 # Initialize session state for case data
@@ -68,53 +85,74 @@ if 'case_data' not in st.session_state:
 
 # Tab 1: Clinical Input
 with tab1:
-    st.header("Clinical Information Input")
+    st.header("📝 Clinical Information Input")
+    st.markdown("Please provide detailed clinical information for accurate analysis.")
+    st.markdown("---")
     
-    col1, col2 = st.columns(2)
+    col1, col2 = st.columns([1, 1], gap="large")
     
     with col1:
-        st.subheader("Chief Complaint & Symptoms")
+        st.subheader("🩺 Chief Complaint & Symptoms")
         symptoms = st.text_area(
             "Patient's primary symptoms and complaints",
             placeholder="e.g., Patient presents with persistent cough, fever, and shortness of breath for 3 days...",
-            height=150
+            height=150,
+            help="Be specific about onset, duration, severity, and associated symptoms"
         )
         
-        st.subheader("Physical Examination Findings")
+        st.subheader("🔍 Physical Examination Findings")
         physical_exam = st.text_area(
             "Relevant physical examination findings",
             placeholder="e.g., Temperature 38.5°C, lung auscultation reveals bilateral crackles...",
-            height=100
+            height=120,
+            help="Include vital signs and pertinent physical findings"
         )
     
     with col2:
-        st.subheader("Medical History")
+        st.subheader("📋 Medical History")
         medical_history = st.text_area(
             "Relevant medical history, medications, allergies",
             placeholder="e.g., History of hypertension, currently on lisinopril, no known allergies...",
-            height=150
+            height=150,
+            help="Include chronic conditions, current medications, and allergies"
         )
         
-        st.subheader("Demographics & Risk Factors")
-        age = st.number_input("Patient Age", min_value=0, max_value=120, value=45)
-        gender = st.selectbox("Gender", ["Male", "Female", "Other", "Prefer not to say"])
+        st.subheader("👤 Demographics & Risk Factors")
+        
+        # Better organized demographics
+        demo_col1, demo_col2 = st.columns(2)
+        with demo_col1:
+            age = st.number_input("Patient Age", min_value=0, max_value=120, value=45)
+        with demo_col2:
+            gender = st.selectbox("Gender", ["Male", "Female", "Other", "Prefer not to say"])
+        
         risk_factors = st.text_area(
             "Additional risk factors",
             placeholder="e.g., Smoking history, occupational exposures, travel history...",
-            height=100
+            height=80,
+            help="Include social history and relevant risk factors"
         )
     
-    # Store clinical data
-    if st.button("Save Clinical Information"):
-        st.session_state.case_data.update({
-            'symptoms': symptoms,
-            'physical_exam': physical_exam,
-            'medical_history': medical_history,
-            'age': age,
-            'gender': gender,
-            'risk_factors': risk_factors
-        })
-        st.success("Clinical information saved!")
+    # Store clinical data with better feedback
+    st.markdown("---")
+    col_save, col_status = st.columns([1, 2])
+    with col_save:
+        if st.button("💾 Save Clinical Information", type="primary"):
+            st.session_state.case_data.update({
+                'symptoms': symptoms,
+                'physical_exam': physical_exam,
+                'medical_history': medical_history,
+                'age': age,
+                'gender': gender,
+                'risk_factors': risk_factors
+            })
+            st.success("✅ Clinical information saved!")
+    
+    with col_status:
+        if st.session_state.case_data.get('symptoms'):
+            st.info("📊 Clinical data ready for AI analysis")
+        else:
+            st.warning("⏳ Enter clinical information above")
 
 # Tab 2: Image Analysis
 with tab2:
@@ -295,10 +333,13 @@ with tab3:
 
 # Professional footer with case export
 st.markdown("---")
-col1, col2, col3 = st.columns(3)
+st.markdown("## 📤 Case Management")
+
+col1, col2, col3 = st.columns([1, 1, 1])
 
 with col1:
-    if st.button("Export Case Report"):
+    st.subheader("💾 Export Report")
+    if st.button("📄 Download Case Report", type="secondary"):
         # Generate PDF or structured report
         case_report = {
             'provider': provider_name,
@@ -306,27 +347,49 @@ with col1:
             'patient_id': patient_id,
             'date': str(case_date),
             'case_data': st.session_state.case_data,
-            'timestamp': datetime.now().isoformat()
+            'timestamp': datetime.now().isoformat(),
+            'app_version': '1.0'
         }
         
         # Convert to JSON for download
         json_report = json.dumps(case_report, indent=2)
         st.download_button(
-            label="Download Case Report (JSON)",
+            label="📥 Download JSON Report",
             data=json_report,
-            file_name=f"case_report_{patient_id}_{case_date}.json",
+            file_name=f"medaid_case_{patient_id}_{case_date}.json",
             mime="application/json"
         )
 
 with col2:
-    if st.button("Clear Case Data"):
+    st.subheader("🗑️ Reset Case")
+    if st.button("🔄 Clear All Data", type="secondary"):
         st.session_state.case_data = {
             'symptoms': '',
             'history': '',
             'images': [],
             'analysis_results': []
         }
-        st.success("Case data cleared")
+        st.success("✅ Case data cleared")
 
 with col3:
-    st.markdown("**Version 1.0** | Professional Use Only") 
+    st.subheader("ℹ️ App Info")
+    st.markdown("**Version 1.0**")
+    st.markdown("*Professional Use Only*")
+    st.markdown("🏥 Healthcare Assistant")
+    
+    # Add helpful links
+    with st.expander("📚 Resources"):
+        st.markdown("""
+        - [Medical Guidelines](https://example.com)
+        - [Support Documentation](https://example.com) 
+        - [Feature Requests](https://example.com)
+        """)
+
+st.markdown("---")
+st.markdown(
+    "<div style='text-align: center; color: #666; font-size: 12px;'>"
+    "MedAid Professional Assistant • Built for Healthcare Professionals • "
+    "Always verify with clinical judgment"
+    "</div>", 
+    unsafe_allow_html=True
+) 
