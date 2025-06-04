@@ -95,9 +95,26 @@ def analyze_image_with_ai(image, image_type, clinical_context=""):
         return get_demo_image_response(image_type)
     
     try:
-        # Convert image to base64 for API
+        # Convert image to base64 for API - handle different modes
         buffered = io.BytesIO()
-        image.save(buffered, format="JPEG")
+        
+        # Handle different image modes for JPEG conversion
+        if image.mode in ('RGBA', 'LA', 'P'):
+            # Convert to RGB for JPEG compatibility
+            rgb_image = image.convert('RGB')
+            rgb_image.save(buffered, format="JPEG", quality=85)
+        elif image.mode == 'L':
+            # Grayscale - convert to RGB
+            rgb_image = image.convert('RGB')
+            rgb_image.save(buffered, format="JPEG", quality=85)
+        elif image.mode == 'RGB':
+            # Already RGB
+            image.save(buffered, format="JPEG", quality=85)
+        else:
+            # Any other mode - convert to RGB
+            rgb_image = image.convert('RGB')
+            rgb_image.save(buffered, format="JPEG", quality=85)
+        
         img_base64 = base64.b64encode(buffered.getvalue()).decode()
         
         # Use vision model for medical image analysis
